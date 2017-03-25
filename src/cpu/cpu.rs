@@ -95,6 +95,10 @@ impl Cpu {
         self.opcode
     }
 
+    pub fn curr_regs(&mut self) -> Vec<u8> {
+        self.clone().reg
+    }
+
     pub fn curr_stack(&mut self) -> Vec<usize> {
         self.clone().stack
     }

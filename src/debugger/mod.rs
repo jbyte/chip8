@@ -50,6 +50,7 @@ impl Debugger {
             let curr_pc = self.cpu.curr_pc();
             let curr_index = self.cpu.curr_index();
             let curr_opcode = self.cpu.curr_opcode();
+            let curr_regs = self.cpu.curr_regs();
             let curr_stack = self.cpu.curr_stack();
             let curr_sp = self.cpu.curr_sp();
             let curr_gfx = self.cpu.curr_gfx();
@@ -59,8 +60,13 @@ impl Debugger {
             println!("opcode:{:04X}", curr_opcode);
             println!("=============================================");
 
+            println!("stack:");
             print_stack(curr_stack, curr_sp);
             println!("=============================================");
+            println!("registers:");
+            print_regs(curr_regs);
+            println!("=============================================");
+            println!("screen:");
             print_gfx(curr_gfx);
             println!("=============================================");
 
@@ -76,6 +82,14 @@ fn print_gfx(gfx: Vec<u8>) {
         }
         println!();
     }
+}
+
+fn print_regs(regs: Vec<u8>) {
+    println!("| 0| 1| 2| 3| 4| 5| 6| 7| 8| 9| A| B| C| D| E| F|");
+    for i in 0..regs.len() {
+        print!("|{:02X}", regs[i as usize]);
+    }
+    println!("|");
 }
 
 fn print_stack(stack: Vec<usize>, sp: usize) {
