@@ -99,6 +99,12 @@ impl Cpu {
                 self.reg[index as usize] = val as u8;
                 self.pc += 2;
             },
+            0x7000 => { // 7XNN: Adds NN to VX
+                let x = (self.opcode & 0x0F00) >> 8;
+                let nn = self.opcode & 0x00FF;
+                self.reg[x as usize] += nn as u8;
+                self.pc += 2;
+            },
             0xA000 => { // ANNN: Sets I to the address NNN
                 let val = self.opcode & 0x0FFF;
                 self.index = val as usize;
@@ -129,13 +135,13 @@ impl Cpu {
             },
             0xF000 => {
                 match self.opcode & 0x00FF {
-                    0x0029 => { // FX29 set I to character sprite in VX
+                    0x0029 => { // FX29: set I to character sprite in VX
                         let x = (self.opcode & 0x0F00) >> 8;
                         let tmp = FONT_SET_START + ((self.reg[x as usize] * 5) as usize);
                         self.index = self.memory[tmp] as usize;
                         self.pc += 2;
                     },
-                    0x0033 => { // FX33 set memory at I:I+2 to VX
+                    0x0033 => { // FX33: set memory at I:I+2 to VX
                         let x = (self.opcode & 0x0F00) >> 8;
                         let val = self.reg[x as usize];
                         self.memory[self.index] = val / 100;
@@ -143,7 +149,7 @@ impl Cpu {
                         self.memory[self.index + 2] = val % 10;
                         self.pc += 2;
                     },
-                    0x0065 => { // FX65 fill V0 to VX with values at I:I+X
+                    0x0065 => { // FX65: fill V0 to VX with values at I:I+X
                         let x = (self.opcode & 0x0F00) >> 8;
                         for i in 0..x {
                             self.reg[i as usize] = self.memory[self.index + (i as usize)];
