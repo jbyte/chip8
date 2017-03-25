@@ -60,7 +60,7 @@ pub struct Cpu {
     opcode: u16,
     memory: Vec<u8>,
     reg: Vec<u8>,
-    index: u16,
+    index: usize,
     // gfx: Vec<Vec<u8>>,
     gfx: Vec<u8>,
     delay_timer: u8,
@@ -92,22 +92,19 @@ impl Cpu {
                 self.stack[self.sp] = self.pc;
                 self.sp += 1;
                 self.pc = addr as usize;
-                println!("pc: {:X}", self.pc);
             },
-            0x6000 => { //6XNN: Sets VX to NN
+            0x6000 => { // 6XNN: Sets VX to NN
                 let index = (self.opcode & 0x0F00) >> 8;
                 let val = self.opcode & 0x00FF;
                 self.reg[index as usize] = val as u8;
-                println!("set V{:X} to: {:X}", index, self.reg[index as usize]);
                 self.pc += 2;
             },
-            0xA000 => { //ANNN: Sets I to the address NNN
+            0xA000 => { // ANNN: Sets I to the address NNN
                 let val = self.opcode & 0x0FFF;
-                self.index = val;
-                println!("Set I to: {:X}", self.index);
+                self.index = val as usize;
                 self.pc += 2;
             },
-            0xD000 => { //DXYN: Draws sprite at cordinate VX, VY with height N
+            0xD000 => { // DXYN: Draws sprite at cordinate VX, VY with height N
                 let x = (self.opcode & 0x0F00) >> 8;
                 let y = (self.opcode & 0x00F0) >> 4;
                 let n = self.opcode & 0x000F;
@@ -128,10 +125,21 @@ impl Cpu {
                         }
                     }
                 }
-
-                println!("gfx: {:?}", self.gfx);
                 self.pc += 2;
-            }
+            },
+            0xF000 => {
+                match self.opcode & 0x00FF {
+                    0x0033 => { // FX33 set memory at I:I+2 to VX
+                        let x = self.opcode & 0x0F00 >> 8;
+                        let val = self.reg[x as usize];
+                        self.memory[self.index] = val / 100;
+                        self.memory[self.index + 1] = (val / 10) % 10;
+                        self.memory[self.index + 2] = val % 10;
+                        self.pc += 2;
+                    },
+                    _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
+                }
+            },
             _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
         }
     }
