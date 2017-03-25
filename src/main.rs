@@ -8,11 +8,15 @@ pub mod cpu;
 fn main() {
     let rom_name = env::args().nth(1).unwrap();
     let rom = read_rom(rom_name);
-    println!("test: {:?}", rom);
     //TODO: setup graphics
     //TODO: setup input
 
-    let cpu = cpu::init();
+    let mut cpu = cpu::init();
+    cpu.load_rom(rom);
+
+    loop {
+        cpu.emulate_cycle();
+    }
 }
 
 fn read_rom<P: AsRef<Path>>(path: P) -> Box<[u8]> {
