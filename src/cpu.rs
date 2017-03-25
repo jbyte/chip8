@@ -87,6 +87,20 @@ impl Cpu {
         self.opcode = (self.memory[self.pc] as u16) << 8 | (self.memory[self.pc+1] as u16);
 
         match self.opcode & 0xF000 {
+            0x0000 => {
+                match self.opcode & 0x0F00 {
+                    0x0000 => {
+                        match self.opcode & 0x00FF {
+                            0x00EE => {
+                                self.sp -= 1;
+                                self.pc = self.stack[self.sp];
+                            },
+                            _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
+                        }
+                    },
+                    _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
+                }
+            },
             0x2000 => { // 2NNN: Calls subroutine at NNN
                 let addr = self.opcode & 0x0FFF;
                 self.stack[self.sp] = self.pc;
