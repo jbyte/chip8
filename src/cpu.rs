@@ -137,6 +137,13 @@ impl Cpu {
                         self.memory[self.index + 2] = val % 10;
                         self.pc += 2;
                     },
+                    0x0065 => { // FX65 fill V0 to VX with values at I:I+X
+                        let x = self.opcode & 0x0F00 >> 8;
+                        for i in 0..x {
+                            self.reg[i as usize] = self.memory[self.index + (i as usize)];
+                        }
+                        self.pc += 2;
+                    },
                     _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
                 }
             },
