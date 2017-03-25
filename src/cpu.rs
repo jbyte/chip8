@@ -65,8 +65,8 @@ pub struct Cpu {
     gfx: Vec<u8>,
     delay_timer: u8,
     sound_timer: u8,
-    stack: Vec<u8>,
-    sp: u8,
+    stack: Vec<usize>,
+    sp: usize,
     key: Vec<u8>,
 }
 
@@ -87,17 +87,24 @@ impl Cpu {
         self.opcode = (self.memory[self.pc] as u16) << 8 | (self.memory[self.pc+1] as u16);
 
         match self.opcode & 0xF000 {
+            0x2000 => { // 2NNN: Calls subroutine at NNN
+                let addr = self.opcode & 0x0FFF;
+                self.stack[self.sp] = self.pc;
+                self.sp += 1;
+                self.pc = addr as usize;
+                println!("pc: {:X}", self.pc);
+            },
             0x6000 => { //6XNN: Sets VX to NN
                 let index = (self.opcode & 0x0F00) >> 8;
                 let val = self.opcode & 0x00FF;
                 self.reg[index as usize] = val as u8;
-                println!("{:X},{:X}", index, self.reg[index as usize]);
+                println!("set V{:X} to: {:X}", index, self.reg[index as usize]);
                 self.pc += 2;
             },
             0xA000 => { //ANNN: Sets I to the address NNN
                 let val = self.opcode & 0x0FFF;
                 self.index = val;
-                println!("{:X}", self.index);
+                println!("Set I to: {:X}", self.index);
                 self.pc += 2;
             },
             0xD000 => { //DXYN: Draws sprite at cordinate VX, VY with height N
@@ -122,7 +129,7 @@ impl Cpu {
                     }
                 }
 
-                println!("{:?}", self.gfx);
+                println!("gfx: {:?}", self.gfx);
                 self.pc += 2;
             }
             _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
