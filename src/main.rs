@@ -1,9 +1,15 @@
+#[macro_use]
+extern crate nom;
+
 use std::env;
 use std::io::Read;
 use std::fs::File;
 use std::path::Path;
 
-pub mod cpu;
+mod cpu;
+mod debugger;
+
+use debugger::Debugger;
 
 fn main() {
     let rom_name: String;
@@ -31,12 +37,14 @@ fn main() {
     //TODO: setup graphics
     //TODO: setup input
 
-    let mut cpu = cpu::init();
+    let mut cpu = cpu::cpu::init();
     cpu.load_rom(rom);
 
     match debug.as_ref() {
         "-d" | "--debug" => {
             // TODO: run with debugger
+            let mut debug = Debugger::new(cpu);
+            debug.run();
         }
         _ => {
             loop {

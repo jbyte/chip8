@@ -13,8 +13,8 @@ const DATA_LENGTH: usize = DATA_END - DATA_START;
 const MEM_LENGTH: usize = 4096;
 const STACK_LEVEL: usize = 16;
 const REG_NUM: usize = 16;
-const GFX_WIDTH: usize = 64;
-const GFX_HEIGHT: usize = 32;
+pub const GFX_WIDTH: usize = 64;
+pub const GFX_HEIGHT: usize = 32;
 
 const FONTSET: [u8; 80] = [
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -54,7 +54,7 @@ pub fn init() -> Cpu {
     ret
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Cpu {
     pc: usize,
     opcode: u16,
@@ -81,6 +81,30 @@ impl Cpu {
         for i in 0..rom.len() {
             self.memory[DATA_START + i] = rom[i];
         }
+    }
+
+    pub fn curr_pc(&mut self) -> usize {
+        self.pc
+    }
+
+    pub fn curr_index(&mut self) -> usize {
+        self.index
+    }
+
+    pub fn curr_opcode(&mut self) -> u16 {
+        self.opcode
+    }
+
+    pub fn curr_stack(&mut self) -> Vec<usize> {
+        self.clone().stack
+    }
+
+    pub fn curr_sp(&mut self) -> usize {
+        self.sp
+    }
+
+    pub fn curr_gfx(&mut self) -> Vec<u8> {
+        self.clone().gfx
     }
 
     pub fn emulate_cycle(&mut self) {
