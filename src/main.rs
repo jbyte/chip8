@@ -6,7 +6,27 @@ use std::path::Path;
 pub mod cpu;
 
 fn main() {
-    let rom_name = env::args().nth(1).unwrap();
+    let rom_name: String;
+    let debug: String;
+
+    let file = env::args().nth(2);
+    let flag = env::args().nth(1);
+
+    match file {
+        None => {
+            match flag {
+                Some(_) => {
+                    rom_name = flag.unwrap();
+                    debug = String::new();
+                },
+                None => panic!("Where the args at? Do need a file atleast.")
+            }
+        },
+        Some(_) => {
+            rom_name = file.unwrap();
+            debug = flag.unwrap();
+        }
+    }
     let rom = read_rom(rom_name);
     //TODO: setup graphics
     //TODO: setup input
@@ -14,8 +34,15 @@ fn main() {
     let mut cpu = cpu::init();
     cpu.load_rom(rom);
 
-    loop {
-        cpu.emulate_cycle();
+    match debug.as_ref() {
+        "-d" | "--debug" => {
+            // TODO: run with debugger
+        }
+        _ => {
+            loop {
+                cpu.emulate_cycle();
+            }
+        }
     }
 }
 
