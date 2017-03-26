@@ -119,7 +119,7 @@ impl Cpu {
                 match self.opcode & 0x0F00 {
                     0x0000 => {
                         match self.opcode & 0x00FF {
-                            0x00EE => {
+                            0x00EE => { // 00EE: return from subroutine
                                 self.sp -= 1;
                                 self.pc = self.stack[self.sp];
                             },
@@ -134,6 +134,15 @@ impl Cpu {
                 self.stack[self.sp] = self.pc;
                 self.sp += 1;
                 self.pc = addr as usize;
+            },
+            0x3000 => { // 3XNN: skip next if VX == NN
+                let x = (self.opcode & 0x0F00) >> 8;
+                let nn = self.opcode & 0x00FF;
+                if self.reg[x as usize] == nn as u8 {
+                    self.pc += 4;
+                } else {
+                    self.pc += 2;
+                }
             },
             0x6000 => { // 6XNN: Sets VX to NN
                 let index = (self.opcode & 0x0F00) >> 8;
