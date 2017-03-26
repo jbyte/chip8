@@ -1,3 +1,5 @@
+use std::io::{stdin, Read, stdout, Write};
+
 const INTERPRETER_START: u32 = 0x000;
 const INTERPRETER_END: u32 = 0x1FF;
 const INTERPRETER_LENGTH: u32 = INTERPRETER_END - INTERPRETER_START;
@@ -35,6 +37,13 @@ const FONTSET: [u8; 80] = [
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 ];
 
+const KEYPAD: [u8; 16] = [
+    0x78, 0x31, 0x32, 0x33,
+    0x71, 0x77, 0x65, 0x61,
+    0x73, 0x64, 0x7A, 0x63,
+    0x34, 0x72, 0x66, 0x76
+];
+
 pub fn init() -> Cpu {
     let mut ret = Cpu {
         pc: 0x200,
@@ -48,7 +57,8 @@ pub fn init() -> Cpu {
         gfx: vec![0; GFX_WIDTH * GFX_HEIGHT],
         delay_timer: 0,
         sound_timer: 0,
-        key: vec![0; STACK_LEVEL],
+        // key: vec![0; KEYPAD.len()],
+        key: KEYPAD.to_vec(),
     };
     ret.load_fontset();
     ret
@@ -81,6 +91,14 @@ impl Cpu {
         for i in 0..rom.len() {
             self.memory[DATA_START + i] = rom[i];
         }
+    }
+
+    fn wait_for_key(&mut self) -> u8 {
+        print!("press key:");
+        stdout().flush().unwrap();
+        let mut c: [u8; 1] = [0];
+        stdin().read(&mut c);
+        self.key.iter().position(|&r| r == c[0]).unwrap() as u8
     }
 
     pub fn curr_pc(&mut self) -> usize {
@@ -233,6 +251,12 @@ impl Cpu {
             },
             0xF000 => {
                 match self.opcode & 0x00FF {
+                    0x000A => { // FX0A: wait for key press and save to VX
+                        let x = (self.opcode & 0x0F00) >> 8;
+                        let val = self.wait_for_key();
+                        self.reg[x as usize] = val;
+                        self.pc += 2;
+                    },
                     0x001E => { // FX1E: add VX to I
                         let x = (self.opcode & 0x0F00) >> 8;
                         self.index += x as usize;
