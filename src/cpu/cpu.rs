@@ -123,6 +123,10 @@ impl Cpu {
                                 self.sp -= 1;
                                 self.pc = self.stack[self.sp];
                             },
+                            0x00E0 => { // 00E0: clear screen
+                                self.gfx = vec![0; GFX_HEIGHT *  GFX_WIDTH];
+                                self.pc += 2;
+                            },
                             _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
                         }
                     },
