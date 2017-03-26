@@ -152,6 +152,15 @@ impl Cpu {
                     self.pc += 2;
                 }
             },
+            0x4000 => { // 4XNN: skip next if VX != NN
+                let x = (self.opcode & 0x0F00) >> 8;
+                let nn = self.opcode & 0x00FF;
+                if self.reg[x as usize] != nn as u8 {
+                    self.pc += 4;
+                } else {
+                    self.pc += 2;
+                }
+            },
             0x6000 => { // 6XNN: Sets VX to NN
                 let index = (self.opcode & 0x0F00) >> 8;
                 let val = self.opcode & 0x00FF;
