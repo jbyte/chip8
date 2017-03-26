@@ -172,6 +172,12 @@ impl Cpu {
                         self.reg[x as usize] = self.reg[y as usize];
                         self.pc += 2;
                     },
+                    0x0002 => { // 8XY2: set VX to VX & VY
+                        let x = (self.opcode & 0x0F00) >> 8;
+                        let y = (self.opcode & 0x00F0) >> 4;
+                        self.reg[x as usize] = self.reg[x as usize] & self.reg[y as usize];
+                        self.pc += 2;
+                    },
                     _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
                 }
             },
