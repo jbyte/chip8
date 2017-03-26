@@ -233,6 +233,11 @@ impl Cpu {
             },
             0xF000 => {
                 match self.opcode & 0x00FF {
+                    0x001E => { // FX1E: add VX to I
+                        let x = (self.opcode & 0x0F00) >> 8;
+                        self.index += x as usize;
+                        self.pc += 2;
+                    },
                     0x0029 => { // FX29: set I to character sprite in VX
                         let x = (self.opcode & 0x0F00) >> 8;
                         let tmp = FONT_SET_START + ((self.reg[x as usize] * 5) as usize);
