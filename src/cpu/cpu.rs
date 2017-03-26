@@ -164,6 +164,17 @@ impl Cpu {
                 self.reg[x as usize] += nn as u8;
                 self.pc += 2;
             },
+            0x8000 => {
+                match self.opcode & 0x000F {
+                    0x0000 => { // 8XY0: set VX to VY
+                        let x = (self.opcode & 0x0F00) >> 8;
+                        let y = (self.opcode & 0x00F0) >> 4;
+                        self.reg[x as usize] = self.reg[y as usize];
+                        self.pc += 2;
+                    },
+                    _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
+                }
+            },
             0xA000 => { // ANNN: Sets I to the address NNN
                 let val = self.opcode & 0x0FFF;
                 self.index = val as usize;
