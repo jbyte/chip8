@@ -23,8 +23,9 @@ impl Debugger {
     }
 
     pub fn run(&mut self) {
+        let mut cnt = 1;
         loop {
-            print!("chip8> ");
+            print!("chip8:{}> ", cnt);
             stdout().flush().unwrap();
 
             let command = match (read_stdin().parse(), self.last_commad) {
@@ -42,6 +43,7 @@ impl Debugger {
             }
 
             self.last_commad = command.ok();
+            cnt += 1;
         }
     }
 
