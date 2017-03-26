@@ -1,4 +1,6 @@
 use std::io::{stdin, Read, stdout, Write};
+use rand::Rng;
+use rand;
 
 const INTERPRETER_START: u32 = 0x000;
 const INTERPRETER_END: u32 = 0x1FF;
@@ -188,7 +190,8 @@ impl Cpu {
             0x7000 => { // 7XNN: Adds NN to VX
                 let x = (self.opcode & 0x0F00) >> 8;
                 let nn = self.opcode & 0x00FF;
-                self.reg[x as usize] += nn as u8;
+                // self.reg[x as usize] += nn as u8;
+                self.reg[x as usize] = (self.reg[x as usize] as u16 + nn) as u8;
                 self.pc += 2;
             },
             0x8000 => {
@@ -224,6 +227,14 @@ impl Cpu {
             0xA000 => { // ANNN: Sets I to the address NNN
                 let val = self.opcode & 0x0FFF;
                 self.index = val as usize;
+                self.pc += 2;
+            },
+            0xC000 => { // CXNN: sets VX to rand & NN
+                let x = (self.opcode & 0x0F00) >> 8;
+                let nn = self.opcode & 0x00FF;
+                let mut rng = rand::thread_rng();
+                let r = rng.gen::<u8>();
+                self.reg[x as usize] = ((r as u16) & nn) as u8;
                 self.pc += 2;
             },
             0xD000 => { // DXYN: Draws sprite at cordinate VX, VY with height N

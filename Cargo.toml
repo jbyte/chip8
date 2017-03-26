@@ -5,3 +5,4 @@ authors = ["Jaka Vute <jaka.vute@gmail.com>"]
 
 [dependencies]
 nom = "^2.2"
+rand = "0.3"
