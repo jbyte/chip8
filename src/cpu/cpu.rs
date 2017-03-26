@@ -129,6 +129,10 @@ impl Cpu {
                     _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
                 }
             },
+            0x1000 => { // 1NNN: jump to NNN
+                let addr = self.opcode & 0x0FFF;
+                self.pc = addr as usize;
+            },
             0x2000 => { // 2NNN: Calls subroutine at NNN
                 let addr = self.opcode & 0x0FFF;
                 self.stack[self.sp] = self.pc;
