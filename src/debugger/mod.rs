@@ -94,6 +94,7 @@ fn print_regs(regs: Vec<u8>) {
 
 fn print_stack(stack: Vec<usize>, sp: usize) {
     for i in 0..stack.len() {
+        print!("|");
         if i == sp {
             print!("[");
         }
@@ -102,7 +103,7 @@ fn print_stack(stack: Vec<usize>, sp: usize) {
             print!("]");
         }
     }
-    println!();
+    println!("|");
 }
 
 fn read_stdin() -> String {
