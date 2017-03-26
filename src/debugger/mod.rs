@@ -78,12 +78,26 @@ impl Debugger {
 }
 
 fn print_gfx(gfx: Vec<u8>) {
-    for i in 0..GFX_HEIGHT {
-        for j in 0..GFX_WIDTH {
-            print!("{}", gfx[(i * GFX_WIDTH + j) as usize]);
-        }
-        println!();
+    for _ in 0..GFX_WIDTH {
+        print!("-");
     }
+    println!("--");
+    for i in 0..GFX_HEIGHT {
+        print!("|");
+        for j in 0..GFX_WIDTH {
+            // print!("{}", gfx[(i * GFX_WIDTH + j) as usize]);
+            if gfx[(i * GFX_WIDTH + j) as usize] == 1 {
+                print!("*");
+            } else {
+                print!(" ");
+            }
+        }
+        println!("|");
+    }
+    for _ in 0..GFX_WIDTH {
+        print!("-");
+    }
+    println!("--");
 }
 
 fn print_regs(regs: Vec<u8>) {
