@@ -264,5 +264,15 @@ impl Cpu {
             },
             _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
         }
+
+        if self.delay_timer > 0 {
+            self.delay_timer -= 1;
+        }
+        if self.sound_timer > 0 {
+            if self.sound_timer == 1 {
+                println!("BEEP!");
+            }
+            self.sound_timer -= 1;
+        }
     }
 }
