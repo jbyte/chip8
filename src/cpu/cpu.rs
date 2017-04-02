@@ -131,6 +131,14 @@ impl Cpu {
         self.clone().gfx
     }
 
+    pub fn curr_dt(&mut self) -> u8 {
+        self.delay_timer
+    }
+
+    pub fn curr_st(&mut self) -> u8 {
+        self.sound_timer
+    }
+
     pub fn emulate_cycle(&mut self) {
         self.opcode = (self.memory[self.pc] as u16) << 8 | (self.memory[self.pc+1] as u16);
 

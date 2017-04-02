@@ -56,9 +56,13 @@ impl Debugger {
             let curr_stack = self.cpu.curr_stack();
             let curr_sp = self.cpu.curr_sp();
             let curr_gfx = self.cpu.curr_gfx();
+            let curr_dt = self.cpu.curr_dt();
+            let curr_st = self.cpu.curr_st();
 
             print!("pc:{:04X},", curr_pc);
             print!("index:{:04X},", curr_index);
+            print!("delay:{:02X},", curr_dt);
+            print!("sound:{:02X},", curr_st);
             println!("opcode:{:04X}", curr_opcode);
             println!("=============================================");
 
