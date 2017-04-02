@@ -100,7 +100,10 @@ impl Cpu {
         stdout().flush().unwrap();
         let mut c: [u8; 1] = [0];
         stdin().read(&mut c);
-        self.key.iter().position(|&r| r == c[0]).unwrap() as u8
+        match self.key.iter().position(|&r| r == c[0]) {
+            Some(_) => self.key.iter().position(|&r| r == c[0]).unwrap() as u8,
+            None => 0xFF
+        }
     }
 
     pub fn curr_pc(&mut self) -> usize {
@@ -269,6 +272,20 @@ impl Cpu {
                 }
                 self.pc += 2;
             },
+            0xE000 => {
+                match self.opcode & 0x00FF {
+                    0x00A1 => { // EXA1: skip next instruction if VX key is NOT pressed
+                        let x = (self.opcode & 0x0F00) >> 8;
+                        let val = self.wait_for_key();
+                        if val == self.reg[x as usize] {
+                            self.pc += 2;
+                        } else {
+                            self.pc += 4;
+                        }
+                    },
+                    _ => panic!("Unknown opcode or not implemented yet: {:X}", self.opcode)
+                }
+            }
             0xF000 => {
                 match self.opcode & 0x00FF {
                     0x0007 => { // FX07: set VX to the delay timer value
