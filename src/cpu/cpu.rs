@@ -271,6 +271,11 @@ impl Cpu {
             },
             0xF000 => {
                 match self.opcode & 0x00FF {
+                    0x0007 => { // FX07: set VX to the delay timer value
+                        let x = (self.opcode & 0x0F00) >> 8;
+                        self.reg[x as usize] = self.delay_timer;
+                        self.pc += 2;
+                    },
                     0x000A => { // FX0A: wait for key press and save to VX
                         let x = (self.opcode & 0x0F00) >> 8;
                         let val = self.wait_for_key();
