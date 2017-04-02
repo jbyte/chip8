@@ -142,6 +142,7 @@ impl Cpu {
                             0x00EE => { // 00EE: return from subroutine
                                 self.sp -= 1;
                                 self.pc = self.stack[self.sp];
+                                self.pc += 2;
                             },
                             0x00E0 => { // 00E0: clear screen
                                 self.gfx = vec![0; GFX_HEIGHT *  GFX_WIDTH];
@@ -266,6 +267,11 @@ impl Cpu {
                         let x = (self.opcode & 0x0F00) >> 8;
                         let val = self.wait_for_key();
                         self.reg[x as usize] = val;
+                        self.pc += 2;
+                    },
+                    0x0015 => { // FX15: set delay timer to value of VX
+                        let x = (self.opcode & 0x0F00) >> 8;
+                        self.delay_timer = self.reg[x as usize];
                         self.pc += 2;
                     },
                     0x001E => { // FX1E: add VX to I
